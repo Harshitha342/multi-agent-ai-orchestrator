@@ -1,11 +1,19 @@
 from fastapi import FastAPI
-from app.database import engine
-from app.models import logs
+from app.orchestration.graph import build_graph
 
 app = FastAPI(title="Multi-Agent AI Orchestrator")
 
-logs.Base.metadata.create_all(bind=engine)
+graph = build_graph()
 
-@app.get("/")
-def root():
-    return {"message": "Backend + PostgreSQL running 🚀"}
+@app.get("/run")
+def run_agents():
+    initial_state = {
+        "task": "Explain how multi-agent systems work",
+        "plan": [],
+        "research": {},
+        "analysis": {},
+        "final_answer": ""
+    }
+
+    result = graph.invoke(initial_state)
+    return result
